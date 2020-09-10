@@ -632,12 +632,12 @@ export default class SegmentLoader extends videojs.EventTarget {
    *         TimeRange object representing the current buffered ranges
    */
   buffered_() {
-    if (!this.sourceUpdater_ || !this.startingMedia_) {
+    if (!this.sourceUpdater_ || !this.mediaConfig_) {
       return videojs.createTimeRanges();
     }
 
     if (this.loaderType_ === 'main') {
-      const { hasAudio, hasVideo, isMuxed } = this.startingMedia_;
+      const { hasAudio, hasVideo, isMuxed } = this.mediaConfig_;
 
       if (hasVideo && hasAudio && !this.audioDisabled_ && !isMuxed) {
         return this.sourceUpdater_.buffered();
@@ -1458,6 +1458,7 @@ export default class SegmentLoader extends videojs.EventTarget {
         video: true
       };
 
+      this.mediaConfig_ = trackInfo;
       this.startingMedia_ = trackInfo;
       this.logger_('trackinfo update', trackInfo);
       this.trigger('trackinfo');
