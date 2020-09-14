@@ -1227,14 +1227,16 @@ export default class SegmentLoader extends videojs.EventTarget {
       return;
     }
 
-    this.logger_(`requesting ${segmentInfo.uri}`, {
-      segmentInfo,
-      playlist,
-      currentMediaIndex: mediaIndex,
-      segmentMediaIndex,
-      startOfSegment,
-      syncRequest
-    });
+    if (segmentInfo) {
+      this.logger_(`requesting ${segmentInfo.uri}`, {
+        segmentInfo,
+        playlist,
+        currentMediaIndex: mediaIndex,
+        segmentMediaIndex,
+        startOfSegment,
+        syncRequest
+      });
+    }
 
     return segmentInfo;
   }
