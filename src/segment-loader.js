@@ -1221,7 +1221,7 @@ export default class SegmentLoader extends videojs.EventTarget {
 
     const segmentInfo = this.generateSegmentInfo_(playlist, segmentMediaIndex, startOfSegment, syncRequest);
 
-    if (segmentInfo && segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
+    if (segmentInfo && this.mediaSource_ && segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
         this.mediaSource_.readyState === 'ended' &&
         !this.seeking_()) {
       return;
