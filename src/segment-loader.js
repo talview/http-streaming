@@ -1089,12 +1089,6 @@ export default class SegmentLoader extends videojs.EventTarget {
       return;
     }
 
-    if (segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
-        this.mediaSource_.readyState === 'ended' &&
-        !this.seeking_()) {
-      return;
-    }
-
     segmentInfo.timestampOffset = timestampOffsetForSegment({
       segmentTimeline: segmentInfo.timeline,
       currentTimeline: this.currentTimeline_,
@@ -1152,7 +1146,6 @@ export default class SegmentLoader extends videojs.EventTarget {
    */
   checkBuffer_(buffered, playlist, mediaIndex, hasPlayed, currentTime, syncPoint) {
     let lastBufferedEnd = 0;
-    let startOfSegment;
 
     if (buffered.length) {
       lastBufferedEnd = buffered.end(buffered.length - 1);
@@ -1176,17 +1169,19 @@ export default class SegmentLoader extends videojs.EventTarget {
       return null;
     }
 
+    let segmentMediaIndex = null;
+    let startOfSegment;
+    let syncRequest = false;
+
     // When the syncPoint is null, there is no way of determining a good
     // conservative segment index to fetch from
     // The best thing to do here is to get the kind of sync-point data by
     // making a request
     if (syncPoint === null) {
-      mediaIndex = this.getSyncSegmentCandidate_(playlist);
-      return this.generateSegmentInfo_(playlist, mediaIndex, null, true);
-    }
-
+      segmentMediaIndex = this.getSyncSegmentCandidate_(playlist);
+      syncRequest = true;
+    } else if (mediaIndex !== null) {
     // Under normal playback conditions fetching is a simple walk forward
-    if (mediaIndex !== null) {
       const segment = playlist.segments[mediaIndex];
 
       if (segment && segment.end) {
@@ -1194,13 +1189,13 @@ export default class SegmentLoader extends videojs.EventTarget {
       } else {
         startOfSegment = lastBufferedEnd;
       }
-      return this.generateSegmentInfo_(playlist, mediaIndex + 1, startOfSegment, false);
-    }
+
+      segmentMediaIndex = mediaIndex + 1;
 
     // There is a sync-point but the lack of a mediaIndex indicates that
     // we need to make a good conservative guess about which segment to
     // fetch
-    if (this.fetchAtBuffer_) {
+    } else if (this.fetchAtBuffer_) {
       // Find the segment containing the end of the buffer
       const mediaSourceInfo = Playlist.getMediaInfoForTime(
         playlist,
@@ -1209,7 +1204,7 @@ export default class SegmentLoader extends videojs.EventTarget {
         syncPoint.time
       );
 
-      mediaIndex = mediaSourceInfo.mediaIndex;
+      segmentMediaIndex = mediaSourceInfo.mediaIndex;
       startOfSegment = mediaSourceInfo.startTime;
     } else {
       // Find the segment containing currentTime
@@ -1220,11 +1215,28 @@ export default class SegmentLoader extends videojs.EventTarget {
         syncPoint.time
       );
 
-      mediaIndex = mediaSourceInfo.mediaIndex;
+      segmentMediaIndex = mediaSourceInfo.mediaIndex;
       startOfSegment = mediaSourceInfo.startTime;
     }
 
-    return this.generateSegmentInfo_(playlist, mediaIndex, startOfSegment, false);
+    const segmentInfo = this.generateSegmentInfo_(playlist, segmentMediaIndex, startOfSegment, syncRequest);
+
+    if (segmentInfo && segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
+        this.mediaSource_.readyState === 'ended' &&
+        !this.seeking_()) {
+      return;
+    }
+
+    this.logger_(`requesting ${segmentInfo.uri}`, {
+      segmentInfo,
+      playlist,
+      currentMediaIndex: mediaIndex,
+      segmentMediaIndex,
+      startOfSegment,
+      syncRequest
+    });
+
+    return segmentInfo;
   }
 
   /**
