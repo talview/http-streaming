@@ -1221,22 +1221,27 @@ export default class SegmentLoader extends videojs.EventTarget {
 
     const segmentInfo = this.generateSegmentInfo_(playlist, segmentMediaIndex, startOfSegment, syncRequest);
 
-    if (segmentInfo && this.mediaSource_ && segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
+    if (!segmentInfo) {
+      return;
+    }
+
+    // if this is the last segment in the playlist
+    // we are not seeking and end of stream has already been called
+    // do not re-request
+    if (this.mediaSource_ && this.playlist_ && segmentInfo.mediaIndex === this.playlist_.segments.length - 1 &&
         this.mediaSource_.readyState === 'ended' &&
         !this.seeking_()) {
       return;
     }
 
-    if (segmentInfo) {
-      this.logger_(`requesting ${segmentInfo.uri}`, {
-        segmentInfo,
-        playlist,
-        currentMediaIndex: mediaIndex,
-        segmentMediaIndex,
-        startOfSegment,
-        syncRequest
-      });
-    }
+    this.logger_(`requesting ${segmentInfo.uri}`, {
+      segmentInfo,
+      playlist,
+      currentMediaIndex: mediaIndex,
+      segmentMediaIndex,
+      startOfSegment,
+      syncRequest
+    });
 
     return segmentInfo;
   }
