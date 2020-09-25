@@ -237,9 +237,10 @@ export const safeLiveIndex = function(playlist, liveEdgePadding) {
 
   let i = playlist.segments.length;
   let lastSegmentDuration = playlist.segments[i - 1].duration || playlist.targetDuration;
+  // Anshul Dharmadhikari - modified last segment duration
   const safeDistance = typeof liveEdgePadding === 'number' ?
     liveEdgePadding :
-    lastSegmentDuration + playlist.targetDuration * 2;
+    lastSegmentDuration;
 
   if (safeDistance === 0) {
     return i;
