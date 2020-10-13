@@ -39,16 +39,13 @@
 	var urlToolkit = createCommonjsModule(function (module, exports) {
 	  // see https://tools.ietf.org/html/rfc1808
 
-	  /* jshint ignore:start */
 	  (function (root) {
-	    /* jshint ignore:end */
-
-	    var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/?#]*)?((?:[^\/\?#]*\/)*.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
+	    var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/?#]*)?((?:[^\/?#]*\/)*[^;?#]*)?(;[^?#]*)?(\?[^#]*)?(#.*)?$/;
 	    var FIRST_SEGMENT_REGEX = /^([^\/?#]*)(.*)$/;
 	    var SLASH_DOT_REGEX = /(?:\/|^)\.(?=\/)/g;
-	    var SLASH_DOT_DOT_REGEX = /(?:\/|^)\.\.\/(?!\.\.\/).*?(?=\/)/g;
+	    var SLASH_DOT_DOT_REGEX = /(?:\/|^)\.\.\/(?!\.\.\/)[^\/]*(?=\/)/g;
 
-	    var URLToolkit = { // jshint ignore:line
+	    var URLToolkit = {
 	      // If opts.alwaysNormalize is true then the path will always be normalized even when it starts with / or //
 	      // E.g
 	      // With opts.alwaysNormalize = false (default, spec compliant)
@@ -181,7 +178,7 @@
 	        // 6d) If the path ends with "<segment>/..", where <segment> is a
 	        // complete path segment not equal to "..", that
 	        // "<segment>/.." is removed.
-	        while (path.length !== (path = path.replace(SLASH_DOT_DOT_REGEX, '')).length) {} // jshint ignore:line
+	        while (path.length !== (path = path.replace(SLASH_DOT_DOT_REGEX, '')).length) {}
 	        return path.split('').reverse().join('');
 	      },
 	      buildURLFromParts: function buildURLFromParts(parts) {
@@ -189,10 +186,8 @@
 	      }
 	    };
 
-	    /* jshint ignore:start */
 	    module.exports = URLToolkit;
 	  })(commonjsGlobal);
-	  /* jshint ignore:end */
 	});
 
 	var win;
@@ -3015,158 +3010,6 @@
 	  return headers;
 	};
 
-	function _defineProperties(target, props) {
-	  for (var i = 0; i < props.length; i++) {
-	    var descriptor = props[i];
-	    descriptor.enumerable = descriptor.enumerable || false;
-	    descriptor.configurable = true;
-	    if ("value" in descriptor) descriptor.writable = true;
-	    Object.defineProperty(target, descriptor.key, descriptor);
-	  }
-	}
-
-	function _createClass(Constructor, protoProps, staticProps) {
-	  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-	  if (staticProps) _defineProperties(Constructor, staticProps);
-	  return Constructor;
-	}
-
-	var createClass$1 = _createClass;
-
-	function _inheritsLoose$1(subClass, superClass) {
-	  subClass.prototype = Object.create(superClass.prototype);
-	  subClass.prototype.constructor = subClass;
-	  subClass.__proto__ = superClass;
-	}
-
-	var inheritsLoose = _inheritsLoose$1;
-
-	/*! @name @videojs/vhs-utils @version 1.2.1 @license MIT */
-
-	/**
-	 * @file stream.js
-	 */
-
-	/**
-	 * A lightweight readable stream implemention that handles event dispatching.
-	 *
-	 * @class Stream
-	 */
-
-	var Stream$1 =
-	/*#__PURE__*/
-	function () {
-	  function Stream() {
-	    this.listeners = {};
-	  }
-	  /**
-	   * Add a listener for a specified event type.
-	   *
-	   * @param {string} type the event name
-	   * @param {Function} listener the callback to be invoked when an event of
-	   * the specified type occurs
-	   */
-
-	  var _proto = Stream.prototype;
-
-	  _proto.on = function on(type, listener) {
-	    if (!this.listeners[type]) {
-	      this.listeners[type] = [];
-	    }
-
-	    this.listeners[type].push(listener);
-	  }
-	  /**
-	   * Remove a listener for a specified event type.
-	   *
-	   * @param {string} type the event name
-	   * @param {Function} listener  a function previously registered for this
-	   * type of event through `on`
-	   * @return {boolean} if we could turn it off or not
-	   */
-	  ;
-
-	  _proto.off = function off(type, listener) {
-	    if (!this.listeners[type]) {
-	      return false;
-	    }
-
-	    var index = this.listeners[type].indexOf(listener); // TODO: which is better?
-	    // In Video.js we slice listener functions
-	    // on trigger so that it does not mess up the order
-	    // while we loop through.
-	    //
-	    // Here we slice on off so that the loop in trigger
-	    // can continue using it's old reference to loop without
-	    // messing up the order.
-
-	    this.listeners[type] = this.listeners[type].slice(0);
-	    this.listeners[type].splice(index, 1);
-	    return index > -1;
-	  }
-	  /**
-	   * Trigger an event of the specified type on this stream. Any additional
-	   * arguments to this function are passed as parameters to event listeners.
-	   *
-	   * @param {string} type the event name
-	   */
-	  ;
-
-	  _proto.trigger = function trigger(type) {
-	    var callbacks = this.listeners[type];
-
-	    if (!callbacks) {
-	      return;
-	    } // Slicing the arguments on every invocation of this method
-	    // can add a significant amount of overhead. Avoid the
-	    // intermediate object creation for the common case of a
-	    // single callback argument
-
-
-	    if (arguments.length === 2) {
-	      var length = callbacks.length;
-
-	      for (var i = 0; i < length; ++i) {
-	        callbacks[i].call(this, arguments[1]);
-	      }
-	    } else {
-	      var args = Array.prototype.slice.call(arguments, 1);
-	      var _length = callbacks.length;
-
-	      for (var _i = 0; _i < _length; ++_i) {
-	        callbacks[_i].apply(this, args);
-	      }
-	    }
-	  }
-	  /**
-	   * Destroys the stream and cleans up.
-	   */
-	  ;
-
-	  _proto.dispose = function dispose() {
-	    this.listeners = {};
-	  }
-	  /**
-	   * Forwards all `data` events on this stream to the destination stream. The
-	   * destination stream should provide a method `push` to receive the data
-	   * events as they arrive.
-	   *
-	   * @param {Stream} destination the stream that will receive all `data` events
-	   * @see http://nodejs.org/api/stream.html#stream_readable_pipe_destination_options
-	   */
-	  ;
-
-	  _proto.pipe = function pipe(destination) {
-	    this.on('data', function (data) {
-	      destination.push(data);
-	    });
-	  };
-
-	  return Stream;
-	}();
-
-	var stream = Stream$1;
-
 	/*! @name pkcs7 @version 1.0.4 @license Apache-2.0 */
 
 	/**
@@ -3180,7 +3023,53 @@
 	  return padded.subarray(0, padded.byteLength - padded[padded.byteLength - 1]);
 	}
 
-	/*! @name aes-decrypter @version 3.0.2 @license Apache-2.0 */
+	var classCallCheck$1 = function classCallCheck(instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+
+	var createClass$1 = function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];
+	      descriptor.enumerable = descriptor.enumerable || false;
+	      descriptor.configurable = true;
+	      if ("value" in descriptor) descriptor.writable = true;
+	      Object.defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }
+
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	}();
+
+	var inherits$1 = function inherits(subClass, superClass) {
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+	  }
+
+	  subClass.prototype = Object.create(superClass && superClass.prototype, {
+	    constructor: {
+	      value: subClass,
+	      enumerable: false,
+	      writable: true,
+	      configurable: true
+	    }
+	  });
+	  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	};
+
+	var possibleConstructorReturn$1 = function possibleConstructorReturn(self, call) {
+	  if (!self) {
+	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	  }
+
+	  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+	};
 
 	/**
 	 * @file aes.js
@@ -3232,18 +3121,19 @@
 	  var decTable = tables[1];
 	  var sbox = encTable[4];
 	  var sboxInv = decTable[4];
-	  var i;
-	  var x;
-	  var xInv;
+	  var i = void 0;
+	  var x = void 0;
+	  var xInv = void 0;
 	  var d = [];
 	  var th = [];
-	  var x2;
-	  var x4;
-	  var x8;
-	  var s;
-	  var tEnc;
-	  var tDec; // Compute double and third tables
+	  var x2 = void 0;
+	  var x4 = void 0;
+	  var x8 = void 0;
+	  var s = void 0;
+	  var tEnc = void 0;
+	  var tDec = void 0;
 
+	  // Compute double and third tables
 	  for (i = 0; i < 256; i++) {
 	    th[(d[i] = i << 1 ^ (i >> 7) * 283) ^ i] = i;
 	  }
@@ -3253,8 +3143,9 @@
 	    s = xInv ^ xInv << 1 ^ xInv << 2 ^ xInv << 3 ^ xInv << 4;
 	    s = s >> 8 ^ s & 255 ^ 99;
 	    sbox[x] = s;
-	    sboxInv[s] = x; // Compute MixColumns
+	    sboxInv[s] = x;
 
+	    // Compute MixColumns
 	    x8 = d[x4 = d[x2 = d[x]]];
 	    tDec = x8 * 0x1010101 ^ x4 * 0x10001 ^ x2 * 0x101 ^ x * 0x1010100;
 	    tEnc = d[s] * 0x101 ^ s * 0x1010100;
@@ -3263,18 +3154,17 @@
 	      encTable[i][x] = tEnc = tEnc << 24 ^ tEnc >>> 8;
 	      decTable[i][s] = tDec = tDec << 24 ^ tDec >>> 8;
 	    }
-	  } // Compactify. Considerable speedup on Firefox.
+	  }
 
-
+	  // Compactify. Considerable speedup on Firefox.
 	  for (i = 0; i < 5; i++) {
 	    encTable[i] = encTable[i].slice(0);
 	    decTable[i] = decTable[i].slice(0);
 	  }
-
 	  return tables;
 	};
-
 	var aesTables = null;
+
 	/**
 	 * Schedule out an AES key for both encryption and decryption. This
 	 * is a low-level class. Use a cipher mode to do bulk encryption.
@@ -3283,33 +3173,34 @@
 	 * @param key {Array} The key as an array of 4, 6 or 8 words.
 	 */
 
-	var AES =
-	/*#__PURE__*/
-	function () {
+	var AES = function () {
 	  function AES(key) {
+	    classCallCheck$1(this, AES);
+
 	    /**
-	    * The expanded S-box and inverse S-box tables. These will be computed
-	    * on the client so that we don't have to send them down the wire.
-	    *
-	    * There are two tables, _tables[0] is for encryption and
-	    * _tables[1] is for decryption.
-	    *
-	    * The first 4 sub-tables are the expanded S-box with MixColumns. The
-	    * last (_tables[01][4]) is the S-box itself.
-	    *
-	    * @private
-	    */
+	     * The expanded S-box and inverse S-box tables. These will be computed
+	     * on the client so that we don't have to send them down the wire.
+	     *
+	     * There are two tables, _tables[0] is for encryption and
+	     * _tables[1] is for decryption.
+	     *
+	     * The first 4 sub-tables are the expanded S-box with MixColumns. The
+	     * last (_tables[01][4]) is the S-box itself.
+	     *
+	     * @private
+	     */
 	    // if we have yet to precompute the S-box tables
 	    // do so now
 	    if (!aesTables) {
 	      aesTables = precompute();
-	    } // then make a copy of that object for use
-
-
+	    }
+	    // then make a copy of that object for use
 	    this._tables = [[aesTables[0][0].slice(), aesTables[0][1].slice(), aesTables[0][2].slice(), aesTables[0][3].slice(), aesTables[0][4].slice()], [aesTables[1][0].slice(), aesTables[1][1].slice(), aesTables[1][2].slice(), aesTables[1][3].slice(), aesTables[1][4].slice()]];
-	    var i;
-	    var j;
-	    var tmp;
+	    var i = void 0;
+	    var j = void 0;
+	    var tmp = void 0;
+	    var encKey = void 0;
+	    var decKey = void 0;
 	    var sbox = this._tables[0][4];
 	    var decTable = this._tables[1];
 	    var keyLen = key.length;
@@ -3319,16 +3210,19 @@
 	      throw new Error('Invalid aes key size');
 	    }
 
-	    var encKey = key.slice(0);
-	    var decKey = [];
-	    this._key = [encKey, decKey]; // schedule encryption keys
+	    encKey = key.slice(0);
+	    decKey = [];
+	    this._key = [encKey, decKey];
 
+	    // schedule encryption keys
 	    for (i = keyLen; i < 4 * keyLen + 28; i++) {
-	      tmp = encKey[i - 1]; // apply sbox
+	      tmp = encKey[i - 1];
 
+	      // apply sbox
 	      if (i % keyLen === 0 || keyLen === 8 && i % keyLen === 4) {
-	        tmp = sbox[tmp >>> 24] << 24 ^ sbox[tmp >> 16 & 255] << 16 ^ sbox[tmp >> 8 & 255] << 8 ^ sbox[tmp & 255]; // shift rows and add rcon
+	        tmp = sbox[tmp >>> 24] << 24 ^ sbox[tmp >> 16 & 255] << 16 ^ sbox[tmp >> 8 & 255] << 8 ^ sbox[tmp & 255];
 
+	        // shift rows and add rcon
 	        if (i % keyLen === 0) {
 	          tmp = tmp << 8 ^ tmp >>> 24 ^ rcon << 24;
 	          rcon = rcon << 1 ^ (rcon >> 7) * 283;
@@ -3336,12 +3230,11 @@
 	      }
 
 	      encKey[i] = encKey[i - keyLen] ^ tmp;
-	    } // schedule decryption keys
+	    }
 
-
+	    // schedule decryption keys
 	    for (j = 0; i; j++, i--) {
 	      tmp = encKey[j & 3 ? i : i - 4];
-
 	      if (i <= 4 || j < 4) {
 	        decKey[j] = tmp;
 	      } else {
@@ -3349,63 +3242,59 @@
 	      }
 	    }
 	  }
+
 	  /**
 	   * Decrypt 16 bytes, specified as four 32-bit words.
 	   *
-	   * @param {number} encrypted0 the first word to decrypt
-	   * @param {number} encrypted1 the second word to decrypt
-	   * @param {number} encrypted2 the third word to decrypt
-	   * @param {number} encrypted3 the fourth word to decrypt
+	   * @param {Number} encrypted0 the first word to decrypt
+	   * @param {Number} encrypted1 the second word to decrypt
+	   * @param {Number} encrypted2 the third word to decrypt
+	   * @param {Number} encrypted3 the fourth word to decrypt
 	   * @param {Int32Array} out the array to write the decrypted words
 	   * into
-	   * @param {number} offset the offset into the output array to start
+	   * @param {Number} offset the offset into the output array to start
 	   * writing results
 	   * @return {Array} The plaintext.
 	   */
 
-	  var _proto = AES.prototype;
-
-	  _proto.decrypt = function decrypt(encrypted0, encrypted1, encrypted2, encrypted3, out, offset) {
-	    var key = this._key[1]; // state variables a,b,c,d are loaded with pre-whitened data
-
+	  AES.prototype.decrypt = function decrypt(encrypted0, encrypted1, encrypted2, encrypted3, out, offset) {
+	    var key = this._key[1];
+	    // state variables a,b,c,d are loaded with pre-whitened data
 	    var a = encrypted0 ^ key[0];
 	    var b = encrypted3 ^ key[1];
 	    var c = encrypted2 ^ key[2];
 	    var d = encrypted1 ^ key[3];
-	    var a2;
-	    var b2;
-	    var c2; // key.length === 2 ?
+	    var a2 = void 0;
+	    var b2 = void 0;
+	    var c2 = void 0;
 
+	    // key.length === 2 ?
 	    var nInnerRounds = key.length / 4 - 2;
-	    var i;
+	    var i = void 0;
 	    var kIndex = 4;
-	    var table = this._tables[1]; // load up the tables
+	    var table = this._tables[1];
 
+	    // load up the tables
 	    var table0 = table[0];
 	    var table1 = table[1];
 	    var table2 = table[2];
 	    var table3 = table[3];
-	    var sbox = table[4]; // Inner rounds. Cribbed from OpenSSL.
+	    var sbox = table[4];
 
+	    // Inner rounds. Cribbed from OpenSSL.
 	    for (i = 0; i < nInnerRounds; i++) {
 	      a2 = table0[a >>> 24] ^ table1[b >> 16 & 255] ^ table2[c >> 8 & 255] ^ table3[d & 255] ^ key[kIndex];
 	      b2 = table0[b >>> 24] ^ table1[c >> 16 & 255] ^ table2[d >> 8 & 255] ^ table3[a & 255] ^ key[kIndex + 1];
 	      c2 = table0[c >>> 24] ^ table1[d >> 16 & 255] ^ table2[a >> 8 & 255] ^ table3[b & 255] ^ key[kIndex + 2];
 	      d = table0[d >>> 24] ^ table1[a >> 16 & 255] ^ table2[b >> 8 & 255] ^ table3[c & 255] ^ key[kIndex + 3];
 	      kIndex += 4;
-	      a = a2;
-	      b = b2;
-	      c = c2;
-	    } // Last round.
+	      a = a2;b = b2;c = c2;
+	    }
 
-
+	    // Last round.
 	    for (i = 0; i < 4; i++) {
 	      out[(3 & -i) + offset] = sbox[a >>> 24] << 24 ^ sbox[b >> 16 & 255] << 16 ^ sbox[c >> 8 & 255] << 8 ^ sbox[d & 255] ^ key[kIndex++];
-	      a2 = a;
-	      a = b;
-	      b = c;
-	      c = d;
-	      d = a2;
+	      a2 = a;a = b;b = c;c = d;d = a2;
 	    }
 	  };
 
@@ -3413,70 +3302,185 @@
 	}();
 
 	/**
-	 * A wrapper around the Stream class to use setTimeout
+	 * @file stream.js
+	 */
+	/**
+	 * A lightweight readable stream implemention that handles event dispatching.
+	 *
+	 * @class Stream
+	 */
+	var Stream$1 = function () {
+	  function Stream() {
+	    classCallCheck$1(this, Stream);
+
+	    this.listeners = {};
+	  }
+
+	  /**
+	   * Add a listener for a specified event type.
+	   *
+	   * @param {String} type the event name
+	   * @param {Function} listener the callback to be invoked when an event of
+	   * the specified type occurs
+	   */
+
+	  Stream.prototype.on = function on(type, listener) {
+	    if (!this.listeners[type]) {
+	      this.listeners[type] = [];
+	    }
+	    this.listeners[type].push(listener);
+	  };
+
+	  /**
+	   * Remove a listener for a specified event type.
+	   *
+	   * @param {String} type the event name
+	   * @param {Function} listener  a function previously registered for this
+	   * type of event through `on`
+	   * @return {Boolean} if we could turn it off or not
+	   */
+
+	  Stream.prototype.off = function off(type, listener) {
+	    if (!this.listeners[type]) {
+	      return false;
+	    }
+
+	    var index = this.listeners[type].indexOf(listener);
+
+	    this.listeners[type].splice(index, 1);
+	    return index > -1;
+	  };
+
+	  /**
+	   * Trigger an event of the specified type on this stream. Any additional
+	   * arguments to this function are passed as parameters to event listeners.
+	   *
+	   * @param {String} type the event name
+	   */
+
+	  Stream.prototype.trigger = function trigger(type) {
+	    var callbacks = this.listeners[type];
+
+	    if (!callbacks) {
+	      return;
+	    }
+
+	    // Slicing the arguments on every invocation of this method
+	    // can add a significant amount of overhead. Avoid the
+	    // intermediate object creation for the common case of a
+	    // single callback argument
+	    if (arguments.length === 2) {
+	      var length = callbacks.length;
+
+	      for (var i = 0; i < length; ++i) {
+	        callbacks[i].call(this, arguments[1]);
+	      }
+	    } else {
+	      var args = Array.prototype.slice.call(arguments, 1);
+	      var _length = callbacks.length;
+
+	      for (var _i = 0; _i < _length; ++_i) {
+	        callbacks[_i].apply(this, args);
+	      }
+	    }
+	  };
+
+	  /**
+	   * Destroys the stream and cleans up.
+	   */
+
+	  Stream.prototype.dispose = function dispose() {
+	    this.listeners = {};
+	  };
+	  /**
+	   * Forwards all `data` events on this stream to the destination stream. The
+	   * destination stream should provide a method `push` to receive the data
+	   * events as they arrive.
+	   *
+	   * @param {Stream} destination the stream that will receive all `data` events
+	   * @see http://nodejs.org/api/stream.html#stream_readable_pipe_destination_options
+	   */
+
+	  Stream.prototype.pipe = function pipe(destination) {
+	    this.on('data', function (data) {
+	      destination.push(data);
+	    });
+	  };
+
+	  return Stream;
+	}();
+
+	/**
+	 * @file async-stream.js
+	 */
+	/**
+	 * A wrapper around the Stream class to use setTiemout
 	 * and run stream "jobs" Asynchronously
 	 *
 	 * @class AsyncStream
 	 * @extends Stream
 	 */
 
-	var AsyncStream =
-	/*#__PURE__*/
-	function (_Stream) {
-	  inheritsLoose(AsyncStream, _Stream);
+	var AsyncStream = function (_Stream) {
+	  inherits$1(AsyncStream, _Stream);
 
 	  function AsyncStream() {
-	    var _this;
+	    classCallCheck$1(this, AsyncStream);
 
-	    _this = _Stream.call(this, stream) || this;
+	    var _this = possibleConstructorReturn$1(this, _Stream.call(this, Stream$1));
+
 	    _this.jobs = [];
 	    _this.delay = 1;
 	    _this.timeout_ = null;
 	    return _this;
 	  }
+
 	  /**
 	   * process an async job
 	   *
 	   * @private
 	   */
 
-	  var _proto = AsyncStream.prototype;
-
-	  _proto.processJob_ = function processJob_() {
+	  AsyncStream.prototype.processJob_ = function processJob_() {
 	    this.jobs.shift()();
-
 	    if (this.jobs.length) {
 	      this.timeout_ = setTimeout(this.processJob_.bind(this), this.delay);
 	    } else {
 	      this.timeout_ = null;
 	    }
-	  }
+	  };
+
 	  /**
 	   * push a job into the stream
 	   *
 	   * @param {Function} job the job to push into the stream
 	   */
-	  ;
 
-	  _proto.push = function push(job) {
+	  AsyncStream.prototype.push = function push(job) {
 	    this.jobs.push(job);
-
 	    if (!this.timeout_) {
 	      this.timeout_ = setTimeout(this.processJob_.bind(this), this.delay);
 	    }
 	  };
 
 	  return AsyncStream;
-	}(stream);
+	}(Stream$1);
+
+	/**
+	 * @file decrypter.js
+	 *
+	 * An asynchronous implementation of AES-128 CBC decryption with
+	 * PKCS#7 padding.
+	 */
 
 	/**
 	 * Convert network-order (big-endian) bytes into their little-endian
 	 * representation.
 	 */
-
 	var ntoh = function ntoh(word) {
 	  return word << 24 | (word & 0xff00) << 8 | (word & 0xff0000) >> 8 | word >>> 24;
 	};
+
 	/**
 	 * Decrypt bytes using AES-128 with CBC and PKCS#7 padding.
 	 *
@@ -3490,50 +3494,58 @@
 	 * @see http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29
 	 * @see https://tools.ietf.org/html/rfc2315
 	 */
-
 	var decrypt = function decrypt(encrypted, key, initVector) {
 	  // word-level access to the encrypted bytes
 	  var encrypted32 = new Int32Array(encrypted.buffer, encrypted.byteOffset, encrypted.byteLength >> 2);
-	  var decipher = new AES(Array.prototype.slice.call(key)); // byte and word-level access for the decrypted output
 
+	  var decipher = new AES(Array.prototype.slice.call(key));
+
+	  // byte and word-level access for the decrypted output
 	  var decrypted = new Uint8Array(encrypted.byteLength);
-	  var decrypted32 = new Int32Array(decrypted.buffer); // temporary variables for working with the IV, encrypted, and
+	  var decrypted32 = new Int32Array(decrypted.buffer);
+
+	  // temporary variables for working with the IV, encrypted, and
 	  // decrypted data
+	  var init0 = void 0;
+	  var init1 = void 0;
+	  var init2 = void 0;
+	  var init3 = void 0;
+	  var encrypted0 = void 0;
+	  var encrypted1 = void 0;
+	  var encrypted2 = void 0;
+	  var encrypted3 = void 0;
 
-	  var init0;
-	  var init1;
-	  var init2;
-	  var init3;
-	  var encrypted0;
-	  var encrypted1;
-	  var encrypted2;
-	  var encrypted3; // iteration variable
+	  // iteration variable
+	  var wordIx = void 0;
 
-	  var wordIx; // pull out the words of the IV to ensure we don't modify the
+	  // pull out the words of the IV to ensure we don't modify the
 	  // passed-in reference and easier access
-
 	  init0 = initVector[0];
 	  init1 = initVector[1];
 	  init2 = initVector[2];
-	  init3 = initVector[3]; // decrypt four word sequences, applying cipher-block chaining (CBC)
-	  // to each decrypted block
+	  init3 = initVector[3];
 
+	  // decrypt four word sequences, applying cipher-block chaining (CBC)
+	  // to each decrypted block
 	  for (wordIx = 0; wordIx < encrypted32.length; wordIx += 4) {
 	    // convert big-endian (network order) words into little-endian
 	    // (javascript order)
 	    encrypted0 = ntoh(encrypted32[wordIx]);
 	    encrypted1 = ntoh(encrypted32[wordIx + 1]);
 	    encrypted2 = ntoh(encrypted32[wordIx + 2]);
-	    encrypted3 = ntoh(encrypted32[wordIx + 3]); // decrypt the block
+	    encrypted3 = ntoh(encrypted32[wordIx + 3]);
 
-	    decipher.decrypt(encrypted0, encrypted1, encrypted2, encrypted3, decrypted32, wordIx); // XOR with the IV, and restore network byte-order to obtain the
+	    // decrypt the block
+	    decipher.decrypt(encrypted0, encrypted1, encrypted2, encrypted3, decrypted32, wordIx);
+
+	    // XOR with the IV, and restore network byte-order to obtain the
 	    // plaintext
-
 	    decrypted32[wordIx] = ntoh(decrypted32[wordIx] ^ init0);
 	    decrypted32[wordIx + 1] = ntoh(decrypted32[wordIx + 1] ^ init1);
 	    decrypted32[wordIx + 2] = ntoh(decrypted32[wordIx + 2] ^ init2);
-	    decrypted32[wordIx + 3] = ntoh(decrypted32[wordIx + 3] ^ init3); // setup the IV for the next round
+	    decrypted32[wordIx + 3] = ntoh(decrypted32[wordIx + 3] ^ init3);
 
+	    // setup the IV for the next round
 	    init0 = encrypted0;
 	    init1 = encrypted1;
 	    init2 = encrypted2;
@@ -3542,6 +3554,7 @@
 
 	  return decrypted;
 	};
+
 	/**
 	 * The `Decrypter` class that manages decryption of AES
 	 * data through `AsyncStream` objects and the `decrypt`
@@ -3554,55 +3567,54 @@
 	 * @class Decrypter
 	 */
 
-	var Decrypter =
-	/*#__PURE__*/
-	function () {
+	var Decrypter = function () {
 	  function Decrypter(encrypted, key, initVector, done) {
+	    classCallCheck$1(this, Decrypter);
+
 	    var step = Decrypter.STEP;
 	    var encrypted32 = new Int32Array(encrypted.buffer);
 	    var decrypted = new Uint8Array(encrypted.byteLength);
 	    var i = 0;
-	    this.asyncStream_ = new AsyncStream(); // split up the encryption job and do the individual chunks asynchronously
 
+	    this.asyncStream_ = new AsyncStream();
+
+	    // split up the encryption job and do the individual chunks asynchronously
 	    this.asyncStream_.push(this.decryptChunk_(encrypted32.subarray(i, i + step), key, initVector, decrypted));
-
 	    for (i = step; i < encrypted32.length; i += step) {
 	      initVector = new Uint32Array([ntoh(encrypted32[i - 4]), ntoh(encrypted32[i - 3]), ntoh(encrypted32[i - 2]), ntoh(encrypted32[i - 1])]);
 	      this.asyncStream_.push(this.decryptChunk_(encrypted32.subarray(i, i + step), key, initVector, decrypted));
-	    } // invoke the done() callback when everything is finished
-
-
+	    }
+	    // invoke the done() callback when everything is finished
 	    this.asyncStream_.push(function () {
 	      // remove pkcs#7 padding from the decrypted bytes
 	      done(null, unpad(decrypted));
 	    });
 	  }
+
 	  /**
 	   * a getter for step the maximum number of bytes to process at one time
 	   *
-	   * @return {number} the value of step 32000
+	   * @return {Number} the value of step 32000
 	   */
-
-	  var _proto = Decrypter.prototype;
 
 	  /**
 	   * @private
 	   */
-	  _proto.decryptChunk_ = function decryptChunk_(encrypted, key, initVector, decrypted) {
+	  Decrypter.prototype.decryptChunk_ = function decryptChunk_(encrypted, key, initVector, decrypted) {
 	    return function () {
 	      var bytes = decrypt(encrypted, key, initVector);
+
 	      decrypted.set(bytes, encrypted.byteOffset);
 	    };
 	  };
 
 	  createClass$1(Decrypter, null, [{
-	    key: "STEP",
-	    get: function get() {
+	    key: 'STEP',
+	    get: function get$$1() {
 	      // 4 * 8000;
 	      return 32000;
 	    }
 	  }]);
-
 	  return Decrypter;
 	}();
 
@@ -5242,62 +5254,39 @@
 	      };
 
 	      videoTrun = function videoTrun(track, offset) {
-	        var bytesOffest, bytes, header, samples, sample, i;
+	        var bytes, samples, sample, i;
 
 	        samples = track.samples || [];
 	        offset += 8 + 12 + 16 * samples.length;
-	        header = trunHeader(samples, offset);
-	        bytes = new Uint8Array(header.length + samples.length * 16);
-	        bytes.set(header);
-	        bytesOffest = header.length;
+
+	        bytes = trunHeader(samples, offset);
 
 	        for (i = 0; i < samples.length; i++) {
 	          sample = samples[i];
-
-	          bytes[bytesOffest++] = (sample.duration & 0xFF000000) >>> 24;
-	          bytes[bytesOffest++] = (sample.duration & 0xFF0000) >>> 16;
-	          bytes[bytesOffest++] = (sample.duration & 0xFF00) >>> 8;
-	          bytes[bytesOffest++] = sample.duration & 0xFF; // sample_duration
-	          bytes[bytesOffest++] = (sample.size & 0xFF000000) >>> 24;
-	          bytes[bytesOffest++] = (sample.size & 0xFF0000) >>> 16;
-	          bytes[bytesOffest++] = (sample.size & 0xFF00) >>> 8;
-	          bytes[bytesOffest++] = sample.size & 0xFF; // sample_size
-	          bytes[bytesOffest++] = sample.flags.isLeading << 2 | sample.flags.dependsOn;
-	          bytes[bytesOffest++] = sample.flags.isDependedOn << 6 | sample.flags.hasRedundancy << 4 | sample.flags.paddingValue << 1 | sample.flags.isNonSyncSample;
-	          bytes[bytesOffest++] = sample.flags.degradationPriority & 0xF0 << 8;
-	          bytes[bytesOffest++] = sample.flags.degradationPriority & 0x0F; // sample_flags
-	          bytes[bytesOffest++] = (sample.compositionTimeOffset & 0xFF000000) >>> 24;
-	          bytes[bytesOffest++] = (sample.compositionTimeOffset & 0xFF0000) >>> 16;
-	          bytes[bytesOffest++] = (sample.compositionTimeOffset & 0xFF00) >>> 8;
-	          bytes[bytesOffest++] = sample.compositionTimeOffset & 0xFF; // sample_composition_time_offset
+	          bytes = bytes.concat([(sample.duration & 0xFF000000) >>> 24, (sample.duration & 0xFF0000) >>> 16, (sample.duration & 0xFF00) >>> 8, sample.duration & 0xFF, // sample_duration
+	          (sample.size & 0xFF000000) >>> 24, (sample.size & 0xFF0000) >>> 16, (sample.size & 0xFF00) >>> 8, sample.size & 0xFF, // sample_size
+	          sample.flags.isLeading << 2 | sample.flags.dependsOn, sample.flags.isDependedOn << 6 | sample.flags.hasRedundancy << 4 | sample.flags.paddingValue << 1 | sample.flags.isNonSyncSample, sample.flags.degradationPriority & 0xF0 << 8, sample.flags.degradationPriority & 0x0F, // sample_flags
+	          (sample.compositionTimeOffset & 0xFF000000) >>> 24, (sample.compositionTimeOffset & 0xFF0000) >>> 16, (sample.compositionTimeOffset & 0xFF00) >>> 8, sample.compositionTimeOffset & 0xFF // sample_composition_time_offset
+	          ]);
 	        }
-	        return box(types.trun, bytes);
+	        return box(types.trun, new Uint8Array(bytes));
 	      };
 
 	      audioTrun = function audioTrun(track, offset) {
-	        var bytes, bytesOffest, header, samples, sample, i;
+	        var bytes, samples, sample, i;
 
 	        samples = track.samples || [];
 	        offset += 8 + 12 + 8 * samples.length;
 
-	        header = trunHeader(samples, offset);
-	        bytes = new Uint8Array(header.length + samples.length * 8);
-	        bytes.set(header);
-	        bytesOffest = header.length;
+	        bytes = trunHeader(samples, offset);
 
 	        for (i = 0; i < samples.length; i++) {
 	          sample = samples[i];
-	          bytes[bytesOffest++] = (sample.duration & 0xFF000000) >>> 24;
-	          bytes[bytesOffest++] = (sample.duration & 0xFF0000) >>> 16;
-	          bytes[bytesOffest++] = (sample.duration & 0xFF00) >>> 8;
-	          bytes[bytesOffest++] = sample.duration & 0xFF; // sample_duration
-	          bytes[bytesOffest++] = (sample.size & 0xFF000000) >>> 24;
-	          bytes[bytesOffest++] = (sample.size & 0xFF0000) >>> 16;
-	          bytes[bytesOffest++] = (sample.size & 0xFF00) >>> 8;
-	          bytes[bytesOffest++] = sample.size & 0xFF; // sample_size
+	          bytes = bytes.concat([(sample.duration & 0xFF000000) >>> 24, (sample.duration & 0xFF0000) >>> 16, (sample.duration & 0xFF00) >>> 8, sample.duration & 0xFF, // sample_duration
+	          (sample.size & 0xFF000000) >>> 24, (sample.size & 0xFF0000) >>> 16, (sample.size & 0xFF00) >>> 8, sample.size & 0xFF]); // sample_size
 	        }
 
-	        return box(types.trun, bytes);
+	        return box(types.trun, new Uint8Array(bytes));
 	      };
 
 	      trun = function trun(track, offset) {
@@ -5666,28 +5655,22 @@
 	      }, {});
 	    };
 
-	    var silence;
-
-	    var silence_1 = function silence_1() {
-	      if (!silence) {
-	        // Frames-of-silence to use for filling in missing AAC frames
-	        var coneOfSilence = {
-	          96000: [highPrefix, [227, 64], zeroFill(154), [56]],
-	          88200: [highPrefix, [231], zeroFill(170), [56]],
-	          64000: [highPrefix, [248, 192], zeroFill(240), [56]],
-	          48000: [highPrefix, [255, 192], zeroFill(268), [55, 148, 128], zeroFill(54), [112]],
-	          44100: [highPrefix, [255, 192], zeroFill(268), [55, 163, 128], zeroFill(84), [112]],
-	          32000: [highPrefix, [255, 192], zeroFill(268), [55, 234], zeroFill(226), [112]],
-	          24000: [highPrefix, [255, 192], zeroFill(268), [55, 255, 128], zeroFill(268), [111, 112], zeroFill(126), [224]],
-	          16000: [highPrefix, [255, 192], zeroFill(268), [55, 255, 128], zeroFill(268), [111, 255], zeroFill(269), [223, 108], zeroFill(195), [1, 192]],
-	          12000: [lowPrefix, zeroFill(268), [3, 127, 248], zeroFill(268), [6, 255, 240], zeroFill(268), [13, 255, 224], zeroFill(268), [27, 253, 128], zeroFill(259), [56]],
-	          11025: [lowPrefix, zeroFill(268), [3, 127, 248], zeroFill(268), [6, 255, 240], zeroFill(268), [13, 255, 224], zeroFill(268), [27, 255, 192], zeroFill(268), [55, 175, 128], zeroFill(108), [112]],
-	          8000: [lowPrefix, zeroFill(268), [3, 121, 16], zeroFill(47), [7]]
-	        };
-	        silence = makeTable(coneOfSilence);
-	      }
-	      return silence;
+	    // Frames-of-silence to use for filling in missing AAC frames
+	    var coneOfSilence = {
+	      96000: [highPrefix, [227, 64], zeroFill(154), [56]],
+	      88200: [highPrefix, [231], zeroFill(170), [56]],
+	      64000: [highPrefix, [248, 192], zeroFill(240), [56]],
+	      48000: [highPrefix, [255, 192], zeroFill(268), [55, 148, 128], zeroFill(54), [112]],
+	      44100: [highPrefix, [255, 192], zeroFill(268), [55, 163, 128], zeroFill(84), [112]],
+	      32000: [highPrefix, [255, 192], zeroFill(268), [55, 234], zeroFill(226), [112]],
+	      24000: [highPrefix, [255, 192], zeroFill(268), [55, 255, 128], zeroFill(268), [111, 112], zeroFill(126), [224]],
+	      16000: [highPrefix, [255, 192], zeroFill(268), [55, 255, 128], zeroFill(268), [111, 255], zeroFill(269), [223, 108], zeroFill(195), [1, 192]],
+	      12000: [lowPrefix, zeroFill(268), [3, 127, 248], zeroFill(268), [6, 255, 240], zeroFill(268), [13, 255, 224], zeroFill(268), [27, 253, 128], zeroFill(259), [56]],
+	      11025: [lowPrefix, zeroFill(268), [3, 127, 248], zeroFill(268), [6, 255, 240], zeroFill(268), [13, 255, 224], zeroFill(268), [27, 255, 192], zeroFill(268), [55, 175, 128], zeroFill(108), [112]],
+	      8000: [lowPrefix, zeroFill(268), [3, 121, 16], zeroFill(47), [7]]
 	    };
+
+	    var silence = makeTable(coneOfSilence);
 
 	    /**
 	     * mux.js
@@ -5807,7 +5790,7 @@
 	        return;
 	      }
 
-	      silentFrame = silence_1()[track.samplerate];
+	      silentFrame = silence[track.samplerate];
 
 	      if (!silentFrame) {
 	        // we don't have a silent frame pregenerated for the sample rate, so use a frame
@@ -6060,16 +6043,10 @@
 	        // this sei_message is a 608/708 caption so save it and break
 	        // there can only ever be one caption message in a frame's sei
 	        if (!result.payload && payloadType === USER_DATA_REGISTERED_ITU_T_T35) {
-	          var userIdentifier = String.fromCharCode(bytes[i + 3], bytes[i + 4], bytes[i + 5], bytes[i + 6]);
-
-	          if (userIdentifier === 'GA94') {
-	            result.payloadType = payloadType;
-	            result.payloadSize = payloadSize;
-	            result.payload = bytes.subarray(i, i + payloadSize);
-	            break;
-	          } else {
-	            result.payload = void 0;
-	          }
+	          result.payloadType = payloadType;
+	          result.payloadSize = payloadSize;
+	          result.payload = bytes.subarray(i, i + payloadSize);
+	          break;
 	        }
 
 	        // skip the payload and parse the next message
@@ -7749,6 +7726,7 @@
 
 	            switch (data.streamType) {
 	              case streamTypes.H264_STREAM_TYPE:
+	              case streamTypes.H264_STREAM_TYPE:
 	                stream$$1 = video;
 	                streamType = 'video';
 	                break;
@@ -8885,19 +8863,15 @@
 
 	    var aac = _AacStream;
 
-	    // constants
-	    var AUDIO_PROPERTIES = ['audioobjecttype', 'channelcount', 'samplerate', 'samplingfrequencyindex', 'samplesize'];
-
-	    var audioProperties = AUDIO_PROPERTIES;
-
-	    var VIDEO_PROPERTIES = ['width', 'height', 'profileIdc', 'levelIdc', 'profileCompatibility', 'sarRatio'];
-
-	    var videoProperties = VIDEO_PROPERTIES;
-
 	    var H264Stream = h264.H264Stream;
 
 	    var isLikelyAacData$1 = utils.isLikelyAacData;
 	    var ONE_SECOND_IN_TS$3 = clock.ONE_SECOND_IN_TS;
+
+	    // constants
+	    var AUDIO_PROPERTIES = ['audioobjecttype', 'channelcount', 'samplerate', 'samplingfrequencyindex', 'samplesize'];
+
+	    var VIDEO_PROPERTIES = ['width', 'height', 'profileIdc', 'levelIdc', 'profileCompatibility', 'sarRatio'];
 
 	    // object types
 	    var _VideoSegmentStream, _AudioSegmentStream, _Transmuxer, _CoalesceStream;
@@ -8969,7 +8943,7 @@
 	        trackDecodeInfo.collectDtsInfo(track, data);
 
 	        if (track) {
-	          audioProperties.forEach(function (prop) {
+	          AUDIO_PROPERTIES.forEach(function (prop) {
 	            track[prop] = data[prop];
 	          });
 	        }
@@ -8979,7 +8953,7 @@
 	      };
 
 	      this.setEarliestDts = function (earliestDts) {
-	        earliestAllowedDts = earliestDts;
+	        earliestAllowedDts = earliestDts - track.timelineStartInfo.baseMediaDecodeTime;
 	      };
 
 	      this.setVideoBaseMediaDecodeTime = function (baseMediaDecodeTime) {
@@ -9091,7 +9065,7 @@
 	          config = nalUnit.config;
 	          track.sps = [nalUnit.data];
 
-	          videoProperties.forEach(function (prop) {
+	          VIDEO_PROPERTIES.forEach(function (prop) {
 	            track[prop] = config[prop];
 	          }, this);
 	        }
@@ -9600,12 +9574,12 @@
 
 	      if (this.videoTrack) {
 	        timelineStartPts = this.videoTrack.timelineStartInfo.pts;
-	        videoProperties.forEach(function (prop) {
+	        VIDEO_PROPERTIES.forEach(function (prop) {
 	          event.info[prop] = this.videoTrack[prop];
 	        }, this);
 	      } else if (this.audioTrack) {
 	        timelineStartPts = this.audioTrack.timelineStartInfo.pts;
-	        audioProperties.forEach(function (prop) {
+	        AUDIO_PROPERTIES.forEach(function (prop) {
 	          event.info[prop] = this.audioTrack[prop];
 	        }, this);
 	      }
@@ -9832,15 +9806,14 @@
 	              pipeline.videoSegmentStream.on('timelineStartInfo', function (timelineStartInfo) {
 	                // When video emits timelineStartInfo data after a flush, we forward that
 	                // info to the AudioSegmentStream, if it exists, because video timeline
-	                // data takes precedence.  Do not do this if keepOriginalTimestamps is set,
-	                // because this is a particularly subtle form of timestamp alteration.
-	                if (audioTrack && !options.keepOriginalTimestamps) {
+	                // data takes precedence.
+	                if (audioTrack) {
 	                  audioTrack.timelineStartInfo = timelineStartInfo;
 	                  // On the first segment we trim AAC frames that exist before the
 	                  // very earliest DTS we have seen in video because Chrome will
 	                  // interpret any video track with a baseMediaDecodeTime that is
 	                  // non-zero as a gap.
-	                  pipeline.audioSegmentStream.setEarliestDts(timelineStartInfo.dts - self.baseMediaDecodeTime);
+	                  pipeline.audioSegmentStream.setEarliestDts(timelineStartInfo.dts);
 	                }
 	              });
 
@@ -9902,6 +9875,9 @@
 	          audioTrack.timelineStartInfo.dts = undefined;
 	          audioTrack.timelineStartInfo.pts = undefined;
 	          trackDecodeInfo.clearDtsInfo(audioTrack);
+	          if (!options.keepOriginalTimestamps) {
+	            audioTrack.timelineStartInfo.baseMediaDecodeTime = baseMediaDecodeTime;
+	          }
 	          if (pipeline.audioTimestampRolloverStream) {
 	            pipeline.audioTimestampRolloverStream.discontinuity();
 	          }
@@ -9914,6 +9890,9 @@
 	          videoTrack.timelineStartInfo.pts = undefined;
 	          trackDecodeInfo.clearDtsInfo(videoTrack);
 	          pipeline.captionStream.reset();
+	          if (!options.keepOriginalTimestamps) {
+	            videoTrack.timelineStartInfo.baseMediaDecodeTime = baseMediaDecodeTime;
+	          }
 	        }
 
 	        if (pipeline.timestampRolloverStream) {
@@ -9988,8 +9967,8 @@
 	      Transmuxer: _Transmuxer,
 	      VideoSegmentStream: _VideoSegmentStream,
 	      AudioSegmentStream: _AudioSegmentStream,
-	      AUDIO_PROPERTIES: audioProperties,
-	      VIDEO_PROPERTIES: videoProperties,
+	      AUDIO_PROPERTIES: AUDIO_PROPERTIES,
+	      VIDEO_PROPERTIES: VIDEO_PROPERTIES,
 	      // exported for testing
 	      generateVideoSegmentTimingInfo: generateVideoSegmentTimingInfo
 	    };
@@ -16459,9 +16438,9 @@
 	    i += 2;
 	    result.matrix = new Uint32Array(data.subarray(i, i + 9 * 4));
 	    i += 9 * 4;
-	    result.width = view.getUint16(i) + view.getUint16(i + 2) / 65536;
+	    result.width = view.getUint16(i) + view.getUint16(i + 2) / 16;
 	    i += 4;
-	    result.height = view.getUint16(i) + view.getUint16(i + 2) / 65536;
+	    result.height = view.getUint16(i) + view.getUint16(i + 2) / 16;
 	    return result;
 	  },
 	  traf: function traf(data) {
@@ -19039,16 +19018,10 @@
 	    // this sei_message is a 608/708 caption so save it and break
 	    // there can only ever be one caption message in a frame's sei
 	    if (!result.payload && payloadType === USER_DATA_REGISTERED_ITU_T_T35) {
-	      var userIdentifier = String.fromCharCode(bytes[i + 3], bytes[i + 4], bytes[i + 5], bytes[i + 6]);
-
-	      if (userIdentifier === 'GA94') {
-	        result.payloadType = payloadType;
-	        result.payloadSize = payloadSize;
-	        result.payload = bytes.subarray(i, i + payloadSize);
-	        break;
-	      } else {
-	        result.payload = void 0;
-	      }
+	      result.payloadType = payloadType;
+	      result.payloadSize = payloadSize;
+	      result.payload = bytes.subarray(i, i + payloadSize);
+	      break;
 	    }
 
 	    // skip the payload and parse the next message
@@ -19308,7 +19281,7 @@
 	  this.trigger('reset', flushSource);
 	};
 
-	var stream$1 = Stream$2;
+	var stream = Stream$2;
 
 	// -----------------
 	// Link To Transport
@@ -19337,7 +19310,7 @@
 	  }, this);
 	};
 
-	CaptionStream.prototype = new stream$1();
+	CaptionStream.prototype = new stream();
 	CaptionStream.prototype.push = function (event) {
 	  var sei, userData, newCaptionPackets;
 
@@ -19829,7 +19802,7 @@
 	    } // finish data processing
 	  };
 	};
-	Cea608Stream.prototype = new stream$1();
+	Cea608Stream.prototype = new stream();
 	// Trigger a cue point that captures the current state of the
 	// display buffer
 	Cea608Stream.prototype.flushDisplayed = function (pts) {
@@ -20214,15 +20187,11 @@
 	          seiNal.pts = matchingSample.pts;
 	          seiNal.dts = matchingSample.dts;
 	          lastMatchedSample = matchingSample;
-	        } else if (lastMatchedSample) {
+	        } else {
 	          // If a matching sample cannot be found, use the last
 	          // sample's values as they should be as close as possible
 	          seiNal.pts = lastMatchedSample.pts;
 	          seiNal.dts = lastMatchedSample.dts;
-	        } else {
-	          // eslint-disable-next-line no-console
-	          console.log("We've encountered a nal unit without data. See mux.js#233.");
-	          break;
 	        }
 
 	        result.push(seiNal);
@@ -22786,7 +22755,7 @@
 	  };
 	};
 
-	TimestampRolloverStream.prototype = new stream$1();
+	TimestampRolloverStream.prototype = new stream();
 
 	var timestampRolloverStream = {
 	  TimestampRolloverStream: TimestampRolloverStream,
@@ -24380,158 +24349,6 @@
 	  var self = this;
 	  var decrypterWorker = function () {
 
-	    function _defineProperties(target, props) {
-	      for (var i = 0; i < props.length; i++) {
-	        var descriptor = props[i];
-	        descriptor.enumerable = descriptor.enumerable || false;
-	        descriptor.configurable = true;
-	        if ("value" in descriptor) descriptor.writable = true;
-	        Object.defineProperty(target, descriptor.key, descriptor);
-	      }
-	    }
-
-	    function _createClass(Constructor, protoProps, staticProps) {
-	      if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-	      if (staticProps) _defineProperties(Constructor, staticProps);
-	      return Constructor;
-	    }
-
-	    var createClass = _createClass;
-
-	    function _inheritsLoose(subClass, superClass) {
-	      subClass.prototype = Object.create(superClass.prototype);
-	      subClass.prototype.constructor = subClass;
-	      subClass.__proto__ = superClass;
-	    }
-
-	    var inheritsLoose = _inheritsLoose;
-
-	    /*! @name @videojs/vhs-utils @version 1.2.1 @license MIT */
-
-	    /**
-	     * @file stream.js
-	     */
-
-	    /**
-	     * A lightweight readable stream implemention that handles event dispatching.
-	     *
-	     * @class Stream
-	     */
-
-	    var Stream =
-	    /*#__PURE__*/
-	    function () {
-	      function Stream() {
-	        this.listeners = {};
-	      }
-	      /**
-	       * Add a listener for a specified event type.
-	       *
-	       * @param {string} type the event name
-	       * @param {Function} listener the callback to be invoked when an event of
-	       * the specified type occurs
-	       */
-
-	      var _proto = Stream.prototype;
-
-	      _proto.on = function on(type, listener) {
-	        if (!this.listeners[type]) {
-	          this.listeners[type] = [];
-	        }
-
-	        this.listeners[type].push(listener);
-	      }
-	      /**
-	       * Remove a listener for a specified event type.
-	       *
-	       * @param {string} type the event name
-	       * @param {Function} listener  a function previously registered for this
-	       * type of event through `on`
-	       * @return {boolean} if we could turn it off or not
-	       */
-	      ;
-
-	      _proto.off = function off(type, listener) {
-	        if (!this.listeners[type]) {
-	          return false;
-	        }
-
-	        var index = this.listeners[type].indexOf(listener); // TODO: which is better?
-	        // In Video.js we slice listener functions
-	        // on trigger so that it does not mess up the order
-	        // while we loop through.
-	        //
-	        // Here we slice on off so that the loop in trigger
-	        // can continue using it's old reference to loop without
-	        // messing up the order.
-
-	        this.listeners[type] = this.listeners[type].slice(0);
-	        this.listeners[type].splice(index, 1);
-	        return index > -1;
-	      }
-	      /**
-	       * Trigger an event of the specified type on this stream. Any additional
-	       * arguments to this function are passed as parameters to event listeners.
-	       *
-	       * @param {string} type the event name
-	       */
-	      ;
-
-	      _proto.trigger = function trigger(type) {
-	        var callbacks = this.listeners[type];
-
-	        if (!callbacks) {
-	          return;
-	        } // Slicing the arguments on every invocation of this method
-	        // can add a significant amount of overhead. Avoid the
-	        // intermediate object creation for the common case of a
-	        // single callback argument
-
-
-	        if (arguments.length === 2) {
-	          var length = callbacks.length;
-
-	          for (var i = 0; i < length; ++i) {
-	            callbacks[i].call(this, arguments[1]);
-	          }
-	        } else {
-	          var args = Array.prototype.slice.call(arguments, 1);
-	          var _length = callbacks.length;
-
-	          for (var _i = 0; _i < _length; ++_i) {
-	            callbacks[_i].apply(this, args);
-	          }
-	        }
-	      }
-	      /**
-	       * Destroys the stream and cleans up.
-	       */
-	      ;
-
-	      _proto.dispose = function dispose() {
-	        this.listeners = {};
-	      }
-	      /**
-	       * Forwards all `data` events on this stream to the destination stream. The
-	       * destination stream should provide a method `push` to receive the data
-	       * events as they arrive.
-	       *
-	       * @param {Stream} destination the stream that will receive all `data` events
-	       * @see http://nodejs.org/api/stream.html#stream_readable_pipe_destination_options
-	       */
-	      ;
-
-	      _proto.pipe = function pipe(destination) {
-	        this.on('data', function (data) {
-	          destination.push(data);
-	        });
-	      };
-
-	      return Stream;
-	    }();
-
-	    var stream = Stream;
-
 	    /*! @name pkcs7 @version 1.0.4 @license Apache-2.0 */
 
 	    /**
@@ -24541,11 +24358,58 @@
 	     * @return {Uint8Array} the unpadded bytes
 	     * @see http://tools.ietf.org/html/rfc5652
 	     */
+
 	    function unpad(padded) {
 	      return padded.subarray(0, padded.byteLength - padded[padded.byteLength - 1]);
 	    }
 
-	    /*! @name aes-decrypter @version 3.0.2 @license Apache-2.0 */
+	    var classCallCheck = function classCallCheck(instance, Constructor) {
+	      if (!(instance instanceof Constructor)) {
+	        throw new TypeError("Cannot call a class as a function");
+	      }
+	    };
+
+	    var createClass = function () {
+	      function defineProperties(target, props) {
+	        for (var i = 0; i < props.length; i++) {
+	          var descriptor = props[i];
+	          descriptor.enumerable = descriptor.enumerable || false;
+	          descriptor.configurable = true;
+	          if ("value" in descriptor) descriptor.writable = true;
+	          Object.defineProperty(target, descriptor.key, descriptor);
+	        }
+	      }
+
+	      return function (Constructor, protoProps, staticProps) {
+	        if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	        if (staticProps) defineProperties(Constructor, staticProps);
+	        return Constructor;
+	      };
+	    }();
+
+	    var inherits = function inherits(subClass, superClass) {
+	      if (typeof superClass !== "function" && superClass !== null) {
+	        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+	      }
+
+	      subClass.prototype = Object.create(superClass && superClass.prototype, {
+	        constructor: {
+	          value: subClass,
+	          enumerable: false,
+	          writable: true,
+	          configurable: true
+	        }
+	      });
+	      if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	    };
+
+	    var possibleConstructorReturn = function possibleConstructorReturn(self, call) {
+	      if (!self) {
+	        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	      }
+
+	      return call && (typeof call === "object" || typeof call === "function") ? call : self;
+	    };
 
 	    /**
 	     * @file aes.js
@@ -24597,18 +24461,19 @@
 	      var decTable = tables[1];
 	      var sbox = encTable[4];
 	      var sboxInv = decTable[4];
-	      var i;
-	      var x;
-	      var xInv;
+	      var i = void 0;
+	      var x = void 0;
+	      var xInv = void 0;
 	      var d = [];
 	      var th = [];
-	      var x2;
-	      var x4;
-	      var x8;
-	      var s;
-	      var tEnc;
-	      var tDec; // Compute double and third tables
+	      var x2 = void 0;
+	      var x4 = void 0;
+	      var x8 = void 0;
+	      var s = void 0;
+	      var tEnc = void 0;
+	      var tDec = void 0;
 
+	      // Compute double and third tables
 	      for (i = 0; i < 256; i++) {
 	        th[(d[i] = i << 1 ^ (i >> 7) * 283) ^ i] = i;
 	      }
@@ -24618,8 +24483,9 @@
 	        s = xInv ^ xInv << 1 ^ xInv << 2 ^ xInv << 3 ^ xInv << 4;
 	        s = s >> 8 ^ s & 255 ^ 99;
 	        sbox[x] = s;
-	        sboxInv[s] = x; // Compute MixColumns
+	        sboxInv[s] = x;
 
+	        // Compute MixColumns
 	        x8 = d[x4 = d[x2 = d[x]]];
 	        tDec = x8 * 0x1010101 ^ x4 * 0x10001 ^ x2 * 0x101 ^ x * 0x1010100;
 	        tEnc = d[s] * 0x101 ^ s * 0x1010100;
@@ -24628,18 +24494,17 @@
 	          encTable[i][x] = tEnc = tEnc << 24 ^ tEnc >>> 8;
 	          decTable[i][s] = tDec = tDec << 24 ^ tDec >>> 8;
 	        }
-	      } // Compactify. Considerable speedup on Firefox.
+	      }
 
-
+	      // Compactify. Considerable speedup on Firefox.
 	      for (i = 0; i < 5; i++) {
 	        encTable[i] = encTable[i].slice(0);
 	        decTable[i] = decTable[i].slice(0);
 	      }
-
 	      return tables;
 	    };
-
 	    var aesTables = null;
+
 	    /**
 	     * Schedule out an AES key for both encryption and decryption. This
 	     * is a low-level class. Use a cipher mode to do bulk encryption.
@@ -24648,33 +24513,34 @@
 	     * @param key {Array} The key as an array of 4, 6 or 8 words.
 	     */
 
-	    var AES =
-	    /*#__PURE__*/
-	    function () {
+	    var AES = function () {
 	      function AES(key) {
+	        classCallCheck(this, AES);
+
 	        /**
-	        * The expanded S-box and inverse S-box tables. These will be computed
-	        * on the client so that we don't have to send them down the wire.
-	        *
-	        * There are two tables, _tables[0] is for encryption and
-	        * _tables[1] is for decryption.
-	        *
-	        * The first 4 sub-tables are the expanded S-box with MixColumns. The
-	        * last (_tables[01][4]) is the S-box itself.
-	        *
-	        * @private
-	        */
+	         * The expanded S-box and inverse S-box tables. These will be computed
+	         * on the client so that we don't have to send them down the wire.
+	         *
+	         * There are two tables, _tables[0] is for encryption and
+	         * _tables[1] is for decryption.
+	         *
+	         * The first 4 sub-tables are the expanded S-box with MixColumns. The
+	         * last (_tables[01][4]) is the S-box itself.
+	         *
+	         * @private
+	         */
 	        // if we have yet to precompute the S-box tables
 	        // do so now
 	        if (!aesTables) {
 	          aesTables = precompute();
-	        } // then make a copy of that object for use
-
-
+	        }
+	        // then make a copy of that object for use
 	        this._tables = [[aesTables[0][0].slice(), aesTables[0][1].slice(), aesTables[0][2].slice(), aesTables[0][3].slice(), aesTables[0][4].slice()], [aesTables[1][0].slice(), aesTables[1][1].slice(), aesTables[1][2].slice(), aesTables[1][3].slice(), aesTables[1][4].slice()]];
-	        var i;
-	        var j;
-	        var tmp;
+	        var i = void 0;
+	        var j = void 0;
+	        var tmp = void 0;
+	        var encKey = void 0;
+	        var decKey = void 0;
 	        var sbox = this._tables[0][4];
 	        var decTable = this._tables[1];
 	        var keyLen = key.length;
@@ -24684,16 +24550,19 @@
 	          throw new Error('Invalid aes key size');
 	        }
 
-	        var encKey = key.slice(0);
-	        var decKey = [];
-	        this._key = [encKey, decKey]; // schedule encryption keys
+	        encKey = key.slice(0);
+	        decKey = [];
+	        this._key = [encKey, decKey];
 
+	        // schedule encryption keys
 	        for (i = keyLen; i < 4 * keyLen + 28; i++) {
-	          tmp = encKey[i - 1]; // apply sbox
+	          tmp = encKey[i - 1];
 
+	          // apply sbox
 	          if (i % keyLen === 0 || keyLen === 8 && i % keyLen === 4) {
-	            tmp = sbox[tmp >>> 24] << 24 ^ sbox[tmp >> 16 & 255] << 16 ^ sbox[tmp >> 8 & 255] << 8 ^ sbox[tmp & 255]; // shift rows and add rcon
+	            tmp = sbox[tmp >>> 24] << 24 ^ sbox[tmp >> 16 & 255] << 16 ^ sbox[tmp >> 8 & 255] << 8 ^ sbox[tmp & 255];
 
+	            // shift rows and add rcon
 	            if (i % keyLen === 0) {
 	              tmp = tmp << 8 ^ tmp >>> 24 ^ rcon << 24;
 	              rcon = rcon << 1 ^ (rcon >> 7) * 283;
@@ -24701,12 +24570,11 @@
 	          }
 
 	          encKey[i] = encKey[i - keyLen] ^ tmp;
-	        } // schedule decryption keys
+	        }
 
-
+	        // schedule decryption keys
 	        for (j = 0; i; j++, i--) {
 	          tmp = encKey[j & 3 ? i : i - 4];
-
 	          if (i <= 4 || j < 4) {
 	            decKey[j] = tmp;
 	          } else {
@@ -24714,63 +24582,59 @@
 	          }
 	        }
 	      }
+
 	      /**
 	       * Decrypt 16 bytes, specified as four 32-bit words.
 	       *
-	       * @param {number} encrypted0 the first word to decrypt
-	       * @param {number} encrypted1 the second word to decrypt
-	       * @param {number} encrypted2 the third word to decrypt
-	       * @param {number} encrypted3 the fourth word to decrypt
+	       * @param {Number} encrypted0 the first word to decrypt
+	       * @param {Number} encrypted1 the second word to decrypt
+	       * @param {Number} encrypted2 the third word to decrypt
+	       * @param {Number} encrypted3 the fourth word to decrypt
 	       * @param {Int32Array} out the array to write the decrypted words
 	       * into
-	       * @param {number} offset the offset into the output array to start
+	       * @param {Number} offset the offset into the output array to start
 	       * writing results
 	       * @return {Array} The plaintext.
 	       */
 
-	      var _proto = AES.prototype;
-
-	      _proto.decrypt = function decrypt(encrypted0, encrypted1, encrypted2, encrypted3, out, offset) {
-	        var key = this._key[1]; // state variables a,b,c,d are loaded with pre-whitened data
-
+	      AES.prototype.decrypt = function decrypt(encrypted0, encrypted1, encrypted2, encrypted3, out, offset) {
+	        var key = this._key[1];
+	        // state variables a,b,c,d are loaded with pre-whitened data
 	        var a = encrypted0 ^ key[0];
 	        var b = encrypted3 ^ key[1];
 	        var c = encrypted2 ^ key[2];
 	        var d = encrypted1 ^ key[3];
-	        var a2;
-	        var b2;
-	        var c2; // key.length === 2 ?
+	        var a2 = void 0;
+	        var b2 = void 0;
+	        var c2 = void 0;
 
+	        // key.length === 2 ?
 	        var nInnerRounds = key.length / 4 - 2;
-	        var i;
+	        var i = void 0;
 	        var kIndex = 4;
-	        var table = this._tables[1]; // load up the tables
+	        var table = this._tables[1];
 
+	        // load up the tables
 	        var table0 = table[0];
 	        var table1 = table[1];
 	        var table2 = table[2];
 	        var table3 = table[3];
-	        var sbox = table[4]; // Inner rounds. Cribbed from OpenSSL.
+	        var sbox = table[4];
 
+	        // Inner rounds. Cribbed from OpenSSL.
 	        for (i = 0; i < nInnerRounds; i++) {
 	          a2 = table0[a >>> 24] ^ table1[b >> 16 & 255] ^ table2[c >> 8 & 255] ^ table3[d & 255] ^ key[kIndex];
 	          b2 = table0[b >>> 24] ^ table1[c >> 16 & 255] ^ table2[d >> 8 & 255] ^ table3[a & 255] ^ key[kIndex + 1];
 	          c2 = table0[c >>> 24] ^ table1[d >> 16 & 255] ^ table2[a >> 8 & 255] ^ table3[b & 255] ^ key[kIndex + 2];
 	          d = table0[d >>> 24] ^ table1[a >> 16 & 255] ^ table2[b >> 8 & 255] ^ table3[c & 255] ^ key[kIndex + 3];
 	          kIndex += 4;
-	          a = a2;
-	          b = b2;
-	          c = c2;
-	        } // Last round.
+	          a = a2;b = b2;c = c2;
+	        }
 
-
+	        // Last round.
 	        for (i = 0; i < 4; i++) {
 	          out[(3 & -i) + offset] = sbox[a >>> 24] << 24 ^ sbox[b >> 16 & 255] << 16 ^ sbox[c >> 8 & 255] << 8 ^ sbox[d & 255] ^ key[kIndex++];
-	          a2 = a;
-	          a = b;
-	          b = c;
-	          c = d;
-	          d = a2;
+	          a2 = a;a = b;b = c;c = d;d = a2;
 	        }
 	      };
 
@@ -24778,70 +24642,185 @@
 	    }();
 
 	    /**
-	     * A wrapper around the Stream class to use setTimeout
+	     * @file stream.js
+	     */
+	    /**
+	     * A lightweight readable stream implemention that handles event dispatching.
+	     *
+	     * @class Stream
+	     */
+	    var Stream = function () {
+	      function Stream() {
+	        classCallCheck(this, Stream);
+
+	        this.listeners = {};
+	      }
+
+	      /**
+	       * Add a listener for a specified event type.
+	       *
+	       * @param {String} type the event name
+	       * @param {Function} listener the callback to be invoked when an event of
+	       * the specified type occurs
+	       */
+
+	      Stream.prototype.on = function on(type, listener) {
+	        if (!this.listeners[type]) {
+	          this.listeners[type] = [];
+	        }
+	        this.listeners[type].push(listener);
+	      };
+
+	      /**
+	       * Remove a listener for a specified event type.
+	       *
+	       * @param {String} type the event name
+	       * @param {Function} listener  a function previously registered for this
+	       * type of event through `on`
+	       * @return {Boolean} if we could turn it off or not
+	       */
+
+	      Stream.prototype.off = function off(type, listener) {
+	        if (!this.listeners[type]) {
+	          return false;
+	        }
+
+	        var index = this.listeners[type].indexOf(listener);
+
+	        this.listeners[type].splice(index, 1);
+	        return index > -1;
+	      };
+
+	      /**
+	       * Trigger an event of the specified type on this stream. Any additional
+	       * arguments to this function are passed as parameters to event listeners.
+	       *
+	       * @param {String} type the event name
+	       */
+
+	      Stream.prototype.trigger = function trigger(type) {
+	        var callbacks = this.listeners[type];
+
+	        if (!callbacks) {
+	          return;
+	        }
+
+	        // Slicing the arguments on every invocation of this method
+	        // can add a significant amount of overhead. Avoid the
+	        // intermediate object creation for the common case of a
+	        // single callback argument
+	        if (arguments.length === 2) {
+	          var length = callbacks.length;
+
+	          for (var i = 0; i < length; ++i) {
+	            callbacks[i].call(this, arguments[1]);
+	          }
+	        } else {
+	          var args = Array.prototype.slice.call(arguments, 1);
+	          var _length = callbacks.length;
+
+	          for (var _i = 0; _i < _length; ++_i) {
+	            callbacks[_i].apply(this, args);
+	          }
+	        }
+	      };
+
+	      /**
+	       * Destroys the stream and cleans up.
+	       */
+
+	      Stream.prototype.dispose = function dispose() {
+	        this.listeners = {};
+	      };
+	      /**
+	       * Forwards all `data` events on this stream to the destination stream. The
+	       * destination stream should provide a method `push` to receive the data
+	       * events as they arrive.
+	       *
+	       * @param {Stream} destination the stream that will receive all `data` events
+	       * @see http://nodejs.org/api/stream.html#stream_readable_pipe_destination_options
+	       */
+
+	      Stream.prototype.pipe = function pipe(destination) {
+	        this.on('data', function (data) {
+	          destination.push(data);
+	        });
+	      };
+
+	      return Stream;
+	    }();
+
+	    /**
+	     * @file async-stream.js
+	     */
+	    /**
+	     * A wrapper around the Stream class to use setTiemout
 	     * and run stream "jobs" Asynchronously
 	     *
 	     * @class AsyncStream
 	     * @extends Stream
 	     */
 
-	    var AsyncStream =
-	    /*#__PURE__*/
-	    function (_Stream) {
-	      inheritsLoose(AsyncStream, _Stream);
+	    var AsyncStream = function (_Stream) {
+	      inherits(AsyncStream, _Stream);
 
 	      function AsyncStream() {
-	        var _this;
+	        classCallCheck(this, AsyncStream);
 
-	        _this = _Stream.call(this, stream) || this;
+	        var _this = possibleConstructorReturn(this, _Stream.call(this, Stream));
+
 	        _this.jobs = [];
 	        _this.delay = 1;
 	        _this.timeout_ = null;
 	        return _this;
 	      }
+
 	      /**
 	       * process an async job
 	       *
 	       * @private
 	       */
 
-	      var _proto = AsyncStream.prototype;
-
-	      _proto.processJob_ = function processJob_() {
+	      AsyncStream.prototype.processJob_ = function processJob_() {
 	        this.jobs.shift()();
-
 	        if (this.jobs.length) {
 	          this.timeout_ = setTimeout(this.processJob_.bind(this), this.delay);
 	        } else {
 	          this.timeout_ = null;
 	        }
-	      }
+	      };
+
 	      /**
 	       * push a job into the stream
 	       *
 	       * @param {Function} job the job to push into the stream
 	       */
-	      ;
 
-	      _proto.push = function push(job) {
+	      AsyncStream.prototype.push = function push(job) {
 	        this.jobs.push(job);
-
 	        if (!this.timeout_) {
 	          this.timeout_ = setTimeout(this.processJob_.bind(this), this.delay);
 	        }
 	      };
 
 	      return AsyncStream;
-	    }(stream);
+	    }(Stream);
+
+	    /**
+	     * @file decrypter.js
+	     *
+	     * An asynchronous implementation of AES-128 CBC decryption with
+	     * PKCS#7 padding.
+	     */
 
 	    /**
 	     * Convert network-order (big-endian) bytes into their little-endian
 	     * representation.
 	     */
-
 	    var ntoh = function ntoh(word) {
 	      return word << 24 | (word & 0xff00) << 8 | (word & 0xff0000) >> 8 | word >>> 24;
 	    };
+
 	    /**
 	     * Decrypt bytes using AES-128 with CBC and PKCS#7 padding.
 	     *
@@ -24855,50 +24834,58 @@
 	     * @see http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_.28CBC.29
 	     * @see https://tools.ietf.org/html/rfc2315
 	     */
-
 	    var decrypt = function decrypt(encrypted, key, initVector) {
 	      // word-level access to the encrypted bytes
 	      var encrypted32 = new Int32Array(encrypted.buffer, encrypted.byteOffset, encrypted.byteLength >> 2);
-	      var decipher = new AES(Array.prototype.slice.call(key)); // byte and word-level access for the decrypted output
 
+	      var decipher = new AES(Array.prototype.slice.call(key));
+
+	      // byte and word-level access for the decrypted output
 	      var decrypted = new Uint8Array(encrypted.byteLength);
-	      var decrypted32 = new Int32Array(decrypted.buffer); // temporary variables for working with the IV, encrypted, and
+	      var decrypted32 = new Int32Array(decrypted.buffer);
+
+	      // temporary variables for working with the IV, encrypted, and
 	      // decrypted data
+	      var init0 = void 0;
+	      var init1 = void 0;
+	      var init2 = void 0;
+	      var init3 = void 0;
+	      var encrypted0 = void 0;
+	      var encrypted1 = void 0;
+	      var encrypted2 = void 0;
+	      var encrypted3 = void 0;
 
-	      var init0;
-	      var init1;
-	      var init2;
-	      var init3;
-	      var encrypted0;
-	      var encrypted1;
-	      var encrypted2;
-	      var encrypted3; // iteration variable
+	      // iteration variable
+	      var wordIx = void 0;
 
-	      var wordIx; // pull out the words of the IV to ensure we don't modify the
+	      // pull out the words of the IV to ensure we don't modify the
 	      // passed-in reference and easier access
-
 	      init0 = initVector[0];
 	      init1 = initVector[1];
 	      init2 = initVector[2];
-	      init3 = initVector[3]; // decrypt four word sequences, applying cipher-block chaining (CBC)
-	      // to each decrypted block
+	      init3 = initVector[3];
 
+	      // decrypt four word sequences, applying cipher-block chaining (CBC)
+	      // to each decrypted block
 	      for (wordIx = 0; wordIx < encrypted32.length; wordIx += 4) {
 	        // convert big-endian (network order) words into little-endian
 	        // (javascript order)
 	        encrypted0 = ntoh(encrypted32[wordIx]);
 	        encrypted1 = ntoh(encrypted32[wordIx + 1]);
 	        encrypted2 = ntoh(encrypted32[wordIx + 2]);
-	        encrypted3 = ntoh(encrypted32[wordIx + 3]); // decrypt the block
+	        encrypted3 = ntoh(encrypted32[wordIx + 3]);
 
-	        decipher.decrypt(encrypted0, encrypted1, encrypted2, encrypted3, decrypted32, wordIx); // XOR with the IV, and restore network byte-order to obtain the
+	        // decrypt the block
+	        decipher.decrypt(encrypted0, encrypted1, encrypted2, encrypted3, decrypted32, wordIx);
+
+	        // XOR with the IV, and restore network byte-order to obtain the
 	        // plaintext
-
 	        decrypted32[wordIx] = ntoh(decrypted32[wordIx] ^ init0);
 	        decrypted32[wordIx + 1] = ntoh(decrypted32[wordIx + 1] ^ init1);
 	        decrypted32[wordIx + 2] = ntoh(decrypted32[wordIx + 2] ^ init2);
-	        decrypted32[wordIx + 3] = ntoh(decrypted32[wordIx + 3] ^ init3); // setup the IV for the next round
+	        decrypted32[wordIx + 3] = ntoh(decrypted32[wordIx + 3] ^ init3);
 
+	        // setup the IV for the next round
 	        init0 = encrypted0;
 	        init1 = encrypted1;
 	        init2 = encrypted2;
@@ -24907,6 +24894,7 @@
 
 	      return decrypted;
 	    };
+
 	    /**
 	     * The `Decrypter` class that manages decryption of AES
 	     * data through `AsyncStream` objects and the `decrypt`
@@ -24919,55 +24907,54 @@
 	     * @class Decrypter
 	     */
 
-	    var Decrypter =
-	    /*#__PURE__*/
-	    function () {
+	    var Decrypter = function () {
 	      function Decrypter(encrypted, key, initVector, done) {
+	        classCallCheck(this, Decrypter);
+
 	        var step = Decrypter.STEP;
 	        var encrypted32 = new Int32Array(encrypted.buffer);
 	        var decrypted = new Uint8Array(encrypted.byteLength);
 	        var i = 0;
-	        this.asyncStream_ = new AsyncStream(); // split up the encryption job and do the individual chunks asynchronously
 
+	        this.asyncStream_ = new AsyncStream();
+
+	        // split up the encryption job and do the individual chunks asynchronously
 	        this.asyncStream_.push(this.decryptChunk_(encrypted32.subarray(i, i + step), key, initVector, decrypted));
-
 	        for (i = step; i < encrypted32.length; i += step) {
 	          initVector = new Uint32Array([ntoh(encrypted32[i - 4]), ntoh(encrypted32[i - 3]), ntoh(encrypted32[i - 2]), ntoh(encrypted32[i - 1])]);
 	          this.asyncStream_.push(this.decryptChunk_(encrypted32.subarray(i, i + step), key, initVector, decrypted));
-	        } // invoke the done() callback when everything is finished
-
-
+	        }
+	        // invoke the done() callback when everything is finished
 	        this.asyncStream_.push(function () {
 	          // remove pkcs#7 padding from the decrypted bytes
 	          done(null, unpad(decrypted));
 	        });
 	      }
+
 	      /**
 	       * a getter for step the maximum number of bytes to process at one time
 	       *
-	       * @return {number} the value of step 32000
+	       * @return {Number} the value of step 32000
 	       */
-
-	      var _proto = Decrypter.prototype;
 
 	      /**
 	       * @private
 	       */
-	      _proto.decryptChunk_ = function decryptChunk_(encrypted, key, initVector, decrypted) {
+	      Decrypter.prototype.decryptChunk_ = function decryptChunk_(encrypted, key, initVector, decrypted) {
 	        return function () {
 	          var bytes = decrypt(encrypted, key, initVector);
+
 	          decrypted.set(bytes, encrypted.byteOffset);
 	        };
 	      };
 
 	      createClass(Decrypter, null, [{
-	        key: "STEP",
-	        get: function get() {
+	        key: 'STEP',
+	        get: function get$$1() {
 	          // 4 * 8000;
 	          return 32000;
 	        }
 	      }]);
-
 	      return Decrypter;
 	    }();
 
