@@ -1,6 +1,6 @@
 export default {
-  GOAL_BUFFER_LENGTH: 30,
-  MAX_GOAL_BUFFER_LENGTH: 60,
+  GOAL_BUFFER_LENGTH: 10,
+  MAX_GOAL_BUFFER_LENGTH: 10,
   GOAL_BUFFER_LENGTH_RATE: 1,
   // 0.5 MB/s
   INITIAL_BANDWIDTH: 4194304,
@@ -9,6 +9,6 @@ export default {
   BANDWIDTH_VARIANCE: 1.2,
   // How much of the buffer must be filled before we consider upswitching
   BUFFER_LOW_WATER_LINE: 0,
-  MAX_BUFFER_LOW_WATER_LINE: 30,
+  MAX_BUFFER_LOW_WATER_LINE: 10,
   BUFFER_LOW_WATER_LINE_RATE: 1
 };
